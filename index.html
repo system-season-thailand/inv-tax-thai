@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic INV Tax THAILAND Data</title>
+
+    <!-- Import the Icon Library -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+    <link rel="stylesheet" href="inv-tax-setup.css">
+
+</head>
+
+<body id="body">
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="all_inv_office_insert_data_content">
+
+
+        <h1>Dynamic INV Tax <span style="color: red; font-weight: bold;">THAILAND</span> Data</h1>
+
+        <textarea id="dataInput" placeholder="Paste your data here"></textarea>
+        <button onclick="playSoundEffect('click'); deleteTextAre()">Reset</button>
+
+    </div>
+
+
+
+
+
+
+
+
+    <section id="invoice_company_indo_storage_for_useing_iinv_tax_section_id" style="display: none;"></section>
+
+
+
+
+
+
+    <section id="whole_invoice_company_section_id">
+
+
+        <div id="proforma_invoice_and_logo_div_id">
+
+
+            <div class="top_left_inv_company_detials_div_class" id="top_left_inv_company_orignal_div_id">
+
+                <img src="season-logo.jpg" id="inv_comp_logo">
+
+                <p>548, Level 37 One City Center, Ploenchit Road</p>
+                <p>Lumpini Pathumwan, Bangkok 10330 (The Premises)</p>
+                <p>Email: reservation@seasonb2b.com</p>
+
+            </div>
+
+
+
+
+            <div id="proforma_invoice_date_and_number_div_id">
+
+                <p style="font-weight: bolder;">INVOICE TAX THAILAND</p>
+
+                <p id="today_inv_company_date_p_id"></p>
+
+
+            </div>
+
+
+
+
+        </div>
+
+
+
+
+        <div id="invoice_company_guest_info_div_id">
+
+            <br>
+            <br>
+            <br>
+            <br>
+
+
+            <div class="invoice_company_guest_info_text_div">
+
+                <div class="invoice_company_guest_name_div_class">
+                    <p>GUEST BY:</p>
+                    <p>NO:</p>
+                    <p>NAME OF CLIENT:</p>
+                </div>
+
+
+                <div class="invoice_company_guest_name_div_class">
+                    <p class="bold_text upper_case_text">DREAM ISLANDS</p>
+
+                    <div class="invoice_tax_number_div_class">
+                        <p id="current_used_inv_tax_p_id" class="bold_text upper_case_text"></p>
+                        <p id="current_used_rev_number_p_id" class="bold_text"></p>
+                    </div>
+
+                    <p id="current_used_guest_name_p_id" class="bold_text"></p>
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+
+        <br>
+
+
+
+        <div id="main_inv_company_row_id" class="invoice_company_row_div_class">
+            <div>
+                <p id="main_inv_tax_row_column_1_id">Period</p>
+            </div>
+            <div>
+                <p id="main_inv_tax_row_column_2_id">Accommodation</p>
+            </div>
+            <div>
+                <p id="main_inv_tax_row_column_3_id">Location</p>
+            </div>
+            <div>
+                <p id="main_inv_tax_row_column_4_id">Length of stay</p>
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+        <div id="invoice_company_main_table_div_id">
+
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <br>
+        <br>
+
+
+
+
+
+
+
+
+
+
+        <div id="payment_details_for_inv_tax" class="invoice_company_bottom_payment_info_div_class">
+
+            <p style="font-weight: bolder; margin-bottom: 35px;">BANK ACCOUNT:</p>
+
+
+            <pre style="font-weight: bolder;">Account Number Baht                     : 1981223000</pre>
+            <pre style="font-weight: bolder;">Swift                                               : KASITHВК</pre>
+            <pre
+                style="font-weight: bolder;">Branch                                            : Thanon Sukhumvit 55 sol thong LO20 branch no 888/8 Capital Residence bldg<br>                                                        1st Fl Sukhumvit 55 Klongtan Nua Wattada<br>                                                        Bangkok 10110 Thailand</pre>
+
+
+        </div>
+
+
+
+
+
+
+
+
+        <!-- Store the data here for later refrence when importing -->
+        <p id="store_supabase_guest_name" style="display: none;"></p>
+        <p id="store_supabase_inv_number" style="display: none;"></p>
+        <p id="store_supabase_current_inv_tax_rev_number_id" style="display: none;">1</p>
+        <p id="store_supabase_current_minus_number_from_total_price_id" style="display: none;"></p>
+
+
+    </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Choose pdf file name box -->
+    <div id="name_pdf_file_div">
+        <input type="text" id="pdf_file_name_input_id" class="dynamic_direction_input_class" placeholder="File Name">
+        <button id="check_pdf_name_button" onclick="checkThePdfNameToDownload()">Download</button>
+    </div>
+
+
+    <div id="export_package_pdf_div_id">
+        <button onclick="openPdfDownloadBox()">Download</button>
+    </div>
+
+    <div id="import_saved_data_from_database_id">
+        <button
+            onclick="playSoundEffect('click'); showOverlay('import_supabase_inv_tax_data_names_dropdown')">Import</button>
+    </div>
+
+    <div id="import_saved_inv_comp_from_database_id">
+        <button onclick="playSoundEffect('click'); showOverlay('import_supabase_inv_comp_indo_data_names_dropdown')">INV
+            COMP THAI</button>
+    </div>
+
+
+
+
+
+
+    <!-- Dropdown Div For Inv Tax Indonesia -->
+    <div id="import_supabase_inv_tax_data_names_dropdown"
+        class="searchable_names_dropdown_class google_sheet_dropdown_div_class">
+
+        <div class="search_bar_div_class">
+            <input type="text" id="import_google_sheet_data_names_search_bar_input_id" class="search_bar_input_class"
+                placeholder="Search" style="direction: ltr;">
+        </div>
+
+
+
+        <div id="all_supabase_stored_inv_tax_data_names_for_importing_data_div"
+            class="company_names_options_dropdown_class">
+            <!-- Dynamic JS Code Here -->
+        </div>
+    </div>
+
+
+
+
+
+
+
+    <!-- Dropdown Div For Inv Comp Indonesia -->
+    <div id="import_supabase_inv_comp_indo_data_names_dropdown"
+        class="searchable_names_dropdown_class google_sheet_dropdown_div_class">
+
+        <div class="search_bar_div_class">
+            <input type="text" id="import_google_sheet_data_names_search_bar_input_id" class="search_bar_input_class"
+                placeholder="Search" style="direction: ltr;">
+        </div>
+
+
+
+        <p onclick="importMultipleSelectedInvCompIndoObjects()">Done</p>
+
+
+
+        <div id="all_supabase_stored_inv_comp_indo_data_names_for_importing_data_div"
+            class="company_names_options_dropdown_class">
+            <!-- Dynamic JS Code Here -->
+        </div>
+    </div>
+
+
+
+
+
+
+
+    <!-- Supabase JS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+
+
+
+    <!-- Download PDF Link -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+
+
+
+
+
+    <script src="inv-tax-indo-multiple-inv.js"></script>
+    <script src="inv-company-indo-database.js"></script>
+    <script src="inv-tax-database.js"></script>
+    <script src="inv-tax-setup.js"></script>
+</body>
+
+</html>

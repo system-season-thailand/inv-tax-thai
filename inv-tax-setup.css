@@ -1,0 +1,701 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@100..900&display=swap');
+
+
+
+
+
+
+/* All */
+* {
+    font-family: "Noto Kufi Arabic", sans-serif;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-weight: 400;
+}
+
+
+/* Body */
+body {
+    opacity: 0;
+    font-family: Arial, sans-serif;
+    transition: all 0.5s ease-in-out;
+}
+
+
+
+
+
+
+
+/* Special Effects */
+.black_overlay {
+    z-index: 9999;
+    opacity: 0;
+    background: rgba(0, 0, 0, 0.6);
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    transition: opacity 0.1s ease-in-out;
+}
+
+.bold_text {
+    font-weight: bold;
+}
+
+.upper_case_text {
+    text-transform: uppercase;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Main content box */
+#all_inv_office_insert_data_content {
+    margin: 30px auto;
+    width: 75%;
+    max-width: 900px;
+    padding: 30px;
+    background: linear-gradient(135deg, #f0f4c3, #e1f5fe, #fce4ec);
+    border-radius: 24px;
+    text-align: center;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Heading */
+#all_inv_office_insert_data_content h1 {
+    color: #4a148c;
+    margin-bottom: 20px;
+    font-size: 26px;
+    font-weight: bold;
+}
+
+/* Textarea */
+#all_inv_office_insert_data_content textarea {
+    width: 100%;
+    height: 160px;
+    padding: 15px;
+    font-size: 1rem;
+    font-family: 'Courier New', monospace;
+    border: 2px solid #aed581;
+    border-radius: 16px;
+    background-color: #ffffff;
+    color: #1a237e;
+    outline: none;
+    resize: none;
+    margin-bottom: 20px;
+}
+
+#all_inv_office_insert_data_content textarea::placeholder {
+    color: #9e9e9e;
+}
+
+/* Button */
+#all_inv_office_insert_data_content button {
+    padding: 12px 28px;
+    background: linear-gradient(145deg, #4fc3f7, #f06292);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+#all_inv_office_insert_data_content button:hover {
+    background: linear-gradient(145deg, #33beff, #ff4180);
+    transform: scale(1.02);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#whole_invoice_company_section_id {
+    background: white;
+    transition: all 0.1s ease-in-out;
+}
+
+#whole_invoice_company_section_id p,
+#whole_invoice_company_section_id h1,
+#whole_invoice_company_section_id h2,
+#whole_invoice_company_section_id h3,
+#whole_invoice_company_section_id h4,
+#whole_invoice_company_section_id h5,
+#whole_invoice_company_section_id h6 {
+    transition: all 0.2s ease-in-out;
+}
+
+#proforma_invoice_and_logo_div_id {
+    display: flex;
+    justify-content: space-between;
+}
+
+#proforma_invoice_and_logo_div_id img {
+    width: 15vmax;
+}
+
+#proforma_invoice_date_and_number_div_id {
+    padding: 0 5px;
+    padding-right: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+#proforma_invoice_date_and_number_div_id p {
+    direction: ltr;
+    font-size: 1.5rem;
+    text-align: left;
+}
+
+
+.invoice_company_guest_info_text_div {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    width: fit-content;
+    align-self: center;
+    justify-self: center;
+}
+
+.top_left_inv_company_detials_div_class {
+    display: flex;
+    flex-direction: column;
+    padding: 0 5px;
+    padding-left: 40px;
+    padding-top: 30px;
+}
+
+.top_left_inv_company_detials_div_class img {
+    align-self: center;
+    width: 15rem;
+}
+
+.top_left_inv_company_detials_div_class p {
+    font-size: 1.2rem;
+    text-align: left;
+    padding-left: 30px;
+}
+
+#invoice_company_guest_name_p_id {
+    direction: ltr;
+    width: 100%;
+    font-size: 1.7rem;
+    text-align: left;
+}
+
+.invoice_company_guest_name_div_class {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 0 20px;
+}
+
+.invoice_company_guest_name_div_class * {
+    font-size: 1.5rem;
+}
+
+.invoice_tax_number_div_class{
+    display: flex;
+}
+
+#invoice_tax_guest_name_div_id {
+    display: flex;
+    justify-content: center;
+}
+
+#invoice_tax_guest_name_div_id p {
+    padding: 0 5px;
+    font-size: 1.5rem;
+}
+
+
+
+
+
+/* Inserted Hotels data position */
+#main_inv_company_row_id {
+    background: rgb(219, 219, 219);
+    color: black;
+    border-top: 0.5px solid black;
+    border-right: 0.5px solid black;
+}
+
+
+.invoice_company_row_div_class {
+    margin: 0 10rem;
+    background: white;
+    direction: ltr;
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    border-bottom: 0.5px solid black;
+}
+
+.invoice_company_row_div_class div {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-left: 0.5px solid black;
+}
+
+.invoice_company_row_div_class div * {
+    text-align: center;
+    direction: ltr;
+    font-size: 1.5rem;
+    font-weight: 600;
+    padding: 0 2px;
+}
+
+
+/* Reduce the width of "من" and "الى" cells */
+.invoice_company_row_div_class div:nth-child(1),
+.invoice_company_row_div_class div:nth-child(3),
+.invoice_company_row_div_class div:nth-child(4) {
+    flex-grow: 0.35;
+}
+
+
+/* Reduce the width of "وقت الوصول" cell */
+.invoice_company_row_div_class div:nth-child(8) {
+    border-left: none;
+    border-right: 0.5px solid black;
+}
+
+.last_invoice_company_row_div_class div:nth-child(1) {
+    flex-grow: 1;
+}
+
+.last_invoice_company_row_div_class div:nth-child(2) {
+    flex-grow: 0.519;
+}
+
+
+
+
+
+.invoice_company_bottom_payment_info_div_class * {
+    font-size: 1.2rem;
+    direction: ltr;
+    padding-left: 10rem;
+    padding-right: 6rem;
+}
+
+
+
+
+
+
+
+/* Delete box message */
+.ensure_your_delete_action {
+    z-index: 1000;
+    background-color: white;
+    width: 95%;
+    padding: 20px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    border-radius: 3px;
+    text-align: center;
+    box-shadow: 0 0 5px black;
+    transform: translate(-50%, -100vh);
+    transition: transform 0.5s ease;
+}
+
+.ensure_your_delete_action button {
+    color: black;
+    font-size: 3rem;
+    margin: 5px;
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 3px;
+    border: 0.5px solid black;
+}
+
+.ensure_your_delete_action button:hover {
+    box-shadow: 0 0.5px 3px black;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Name PDF file popup */
+#name_pdf_file_div {
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -100vh);
+    /* Hidden by default */
+    background: linear-gradient(135deg, #e3f2fd, #fce4ec);
+    /* Light blue-pink blend */
+    padding: 25px;
+    width: 65%;
+    overflow: auto;
+    border-radius: 18px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    transition: transform 0.5s ease;
+    text-align: center;
+    font-family: 'Segoe UI', sans-serif;
+    border: none;
+}
+
+/* Input field */
+#name_pdf_file_div input {
+    width: 100%;
+    font-size: 1.2rem;
+    text-align: center;
+    border: 2px solid #90caf9;
+    border-radius: 12px;
+    padding: 10px;
+    margin-top: 10px;
+    outline: none;
+    background-color: #ffffff;
+    color: #333;
+    transition: border 0.2s ease;
+}
+
+#name_pdf_file_div input:focus {
+    border-color: #64b5f6;
+}
+
+/* Confirm button */
+#name_pdf_file_div button {
+    background: linear-gradient(145deg, #4fc3f7, #f06292);
+    color: white;
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-top: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 25px;
+    border: none;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 10px rgba(100, 181, 246, 0.3);
+}
+
+#name_pdf_file_div button:hover {
+    background: linear-gradient(145deg, #33beff, #ff4180);
+    transform: scale(1.05);
+}
+
+
+
+
+
+
+
+
+
+
+/* Download Button - Right Side - Friendly for All */
+#export_package_pdf_div_id {
+    position: fixed;
+    top: 50%;
+    right: 0;
+    z-index: 1000;
+}
+
+#export_package_pdf_div_id button {
+    background: linear-gradient(145deg, #4fc3f7, #f06292);
+    color: white;
+    font-size: 1.1rem;
+    font-weight: bold;
+    padding: 30px 12px;
+    border: none;
+    border-top-left-radius: 30px;
+    border-bottom-left-radius: 30px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+#export_package_pdf_div_id button:hover {
+    background: linear-gradient(145deg, #33beff, #ff4180);
+    transform: scale(1.02);
+}
+
+
+/* Import Button - Left Side - Friendly for All */
+#import_saved_data_from_database_id {
+    position: fixed;
+    top: 50%;
+    left: 0;
+    z-index: 1000;
+}
+
+#import_saved_data_from_database_id button {
+    background: linear-gradient(145deg, #4fc3f7, #f06292);
+    color: white;
+    font-size: 1.1rem;
+    font-weight: bold;
+    padding: 30px 12px;
+    border: none;
+    border-top-right-radius: 30px;
+    border-bottom-right-radius: 30px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+#import_saved_data_from_database_id button:hover {
+    background: linear-gradient(145deg, #33beff, #ff4180);
+    transform: scale(1.02);
+}
+
+
+#import_saved_inv_comp_from_database_id {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+#import_saved_inv_comp_from_database_id button {
+    background: linear-gradient(145deg, #4fc3f7, #f06292);
+    color: white;
+    font-size: 1.1rem;
+    font-weight: bold;
+    padding: 30px 12px;
+    border: none;
+    border-top-right-radius: 30px;
+    border-bottom-right-radius: 30px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+#import_saved_inv_comp_from_database_id button:hover {
+    background: linear-gradient(145deg, #33beff, #ff4180);
+    transform: scale(1.02);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.red_text_color_class {
+    color: red;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Main dropdown container */
+.searchable_names_dropdown_class {
+    z-index: 1000;
+    background: linear-gradient(180deg, #ffc6f2, #b2ebf2);
+    /* Soft gray to aqua */
+    width: 100%;
+    min-height: 50vh;
+    max-height: 50vh;
+    padding: 15px 10px;
+    position: fixed;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    transform: translateY(100%);
+    transition: transform 0.3s ease-in-out;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Visible state for the dropdown */
+.searchable_names_dropdown_class.show {
+    transform: translateY(0);
+}
+
+/* Search bar container */
+.search_bar_div_class {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+/* Search bar input */
+.search_bar_input_class {
+    text-align: center;
+    width: 100%;
+    font-size: 1.3rem;
+    padding: 12px;
+    border: 2px solid #90caf9;
+    /* Light blue border */
+    border-radius: 12px;
+    color: #3e3e3e;
+    background-color: #ffffff;
+    outline: none;
+    transition: border 0.2s ease;
+}
+
+.search_bar_input_class:focus {
+    border-color: #64b5f6;
+}
+
+/* Placeholder styling */
+.search_bar_input_class::placeholder {
+    color: #9e9e9e;
+}
+
+/* Company name options container */
+.company_names_options_dropdown_class {
+    background: transparent;
+    width: 100%;
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+/* Individual name button */
+.company_names_options_dropdown_class h3 {
+    background: white;
+    font-size: 1.5rem;
+    margin: 8px;
+    padding: 10px 20px;
+    border-radius: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+
+    /* Make it pop */
+    box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.15),
+        /* Main pop shadow */
+        0 0 0 2px rgba(100, 181, 246, 0.2);
+    /* Outline glow */
+}
+
+.company_names_options_dropdown_class h3:hover {
+    background: #e3f2fd;
+    transform: translateY(-2px) scale(1.02);
+    /* Slight lift + zoom */
+    box-shadow:
+        0 12px 24px rgba(0, 0, 0, 0.2),
+        0 0 0 3px rgba(66, 165, 245, 0.3);
+    /* Brighter pop on hover */
+}
+
+.google_sheet_dropdown_div_class{
+    z-index: 99999;
+}
+
+/* Paragraph options (if used) */
+.google_sheet_dropdown_div_class p {
+    background: #e3f2fd;
+    color: #1a237e;
+    font-size: 1rem;
+    padding: 6px 12px;
+    text-align: center;
+    border-radius: 12px;
+    cursor: pointer;
+    margin: 5px;
+    transition: all 0.2s ease-in-out;
+}
+
+.google_sheet_dropdown_div_class p:hover {
+    background: #90caf9;
+    color: white;
+}
+
+#import_supabase_inv_comp_indo_data_names_dropdown p{
+    background: white;
+    color: black;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    padding: 5px 25px;
+}
+
+#import_supabase_inv_comp_indo_data_names_dropdown p:hover{
+    background: #e3f2fd;
+}
