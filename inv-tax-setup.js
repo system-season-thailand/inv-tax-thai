@@ -277,8 +277,8 @@ document.getElementById("dataInput").oninput = function () {
 
 function processInvoiceData(data) {
     const rows = data.trim().split("\n");
-    const invoiceNo = rows[1].split(":")[1].trim();
-    const clientName = rows[2].split(":")[1].trim();
+    const invoiceNo = rows[2].split(":")[1].trim();
+    const clientName = rows[3].split(":")[1].trim();
 
 
 
