@@ -279,34 +279,30 @@ function processInvoiceData(data) {
     const rows = data.trim().split("\n");
 
     /* Just in case the star cell copied was gust by of company by */
-    let invoiceNo, clientName;
+    let guestBy, invoiceNo, clientName;
 
     if (rows[0].startsWith("GUEST BY")) {
-        invoiceNo = rows[1].split(":")[1].trim().split("-").pop();
+        guestBy = rows[0].split(":")[1].trim();
+        invoiceNo = rows[1].split(":")[1].trim();
         clientName = rows[2].split(":")[1].trim();
     } else {
-        invoiceNo = rows[2].split(":")[1].trim().split("-").pop();
+        guestBy = rows[1].split(":")[1].trim();
+        invoiceNo = rows[2].split(":")[1].trim();
         clientName = rows[3].split(":")[1].trim();
     }
 
 
-    // Always format invoice number to 4 digits with leading zeros
-    const formattedInvoiceNo = invoiceNo.padStart(4, "0");
-    document.getElementById('current_used_inv_tax_p_id').innerText = formattedInvoiceNo;
+
+    /* Get the company name that is between the () */
+    let travelAgency = guestBy.match(/\(([^)]+)\)/)?.[1] || guestBy;
 
 
+    // Place the values in the inv tax content
+    document.getElementById('current_used_company_name_p_id').innerText = travelAgency;
+    document.getElementById('current_used_inv_tax_p_id').innerText = invoiceNo;
+    document.getElementById("current_used_guest_name_p_id").innerHTML = clientName;
 
 
-
-
-
-    /* in 7 Apr 2026 delete the first if and keep only the else (I used it to avoid error in old packages) */
-    document.querySelector("#current_used_guest_name_p_id").innerHTML = clientName;
-
-
-    /* Store the values in the google sheet for later refrence (when importing) */
-    document.getElementById('store_supabase_guest_name').innerText = clientName;
-    document.getElementById('store_supabase_inv_number').innerText = formattedInvoiceNo;
 
 
 
