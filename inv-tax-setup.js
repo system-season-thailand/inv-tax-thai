@@ -298,7 +298,13 @@ function processInvoiceData(data) {
 
 
     // Place the values in the inv tax content
-    document.getElementById('current_used_company_name_p_id').innerText = travelAgency;
+    if (travelAgency.toUpperCase() === 'RPIBADI') {
+        document.getElementById('current_used_company_name_p_id').innerText = '';
+
+    } else {
+        document.getElementById('current_used_company_name_p_id').innerText = travelAgency;
+    }
+
     document.getElementById('current_used_inv_tax_p_id').innerText = invoiceNo;
     document.getElementById("current_used_guest_name_p_id").innerHTML = clientName;
 
