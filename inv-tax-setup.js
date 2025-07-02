@@ -277,10 +277,17 @@ document.getElementById("dataInput").oninput = function () {
 
 function processInvoiceData(data) {
     const rows = data.trim().split("\n");
-    const invoiceNo = rows[2].split(":")[1].trim();
-    const clientName = rows[3].split(":")[1].trim();
 
+    /* Just in case the star cell copied was gust by of company by */
+    let invoiceNo, clientName;
 
+    if (rows[0].startsWith("GUEST BY")) {
+        invoiceNo = rows[1].split(":")[1].trim().split("-").pop();
+        clientName = rows[2].split(":")[1].trim();
+    } else {
+        invoiceNo = rows[2].split(":")[1].trim().split("-").pop();
+        clientName = rows[3].split(":")[1].trim();
+    }
 
 
     // Always format invoice number to 4 digits with leading zeros
