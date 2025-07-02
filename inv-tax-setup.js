@@ -209,13 +209,14 @@ function openPdfDownloadBox() {
     if (document.getElementById("dataInput").value !== '' || new_or_imported_inv_company_variable !== 'new_invoice_company') {
 
         // Get all necessary values
+        let companyName = document.getElementById("current_used_company_name_p_id").innerText;
         let invNumber = document.getElementById("current_used_inv_tax_p_id").innerText;
         let clientNameRaw = document.getElementById("current_used_guest_name_p_id").innerText;
         let clientName = clientNameRaw.replace(/[()]/g, '').trim();
         let revSpan = document.getElementById("current_used_rev_number_p_id").innerText;
 
         // Build PDF name
-        let pdfName = `Inv Tax ${invNumber}`;
+        let pdfName = `Inv Tax ${companyName} ${invNumber}`;
         if (revSpan) pdfName += `${revSpan}`;
         pdfName += ` ${clientName}`;
 
