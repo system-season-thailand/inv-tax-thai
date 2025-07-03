@@ -346,7 +346,50 @@ function processInvoiceData(data) {
     };
 
 
-    const extractData = (lines) => {
+
+
+    /* Function to delete any break-line inserted inn the copied excel data */
+    const normalizeExcelText = (rawText) => {
+        const lines = rawText.split('\n');
+        const normalizedLines = [];
+
+        let buffer = '';
+        let inQuotedCell = false;
+
+        for (let line of lines) {
+            const quoteCount = (line.match(/"/g) || []).length;
+
+            if (!inQuotedCell) {
+                if (quoteCount % 2 === 1) {
+                    buffer = line;
+                    inQuotedCell = true;
+                } else {
+                    normalizedLines.push(line);
+                }
+            } else {
+                buffer += ' ' + line;
+                if (quoteCount % 2 === 1) {
+                    normalizedLines.push(buffer);
+                    buffer = '';
+                    inQuotedCell = false;
+                }
+            }
+        }
+
+        if (buffer.trim()) {
+            normalizedLines.push(buffer);
+        }
+
+        // ✨ Clean up each line: remove outer quotes from quoted fields
+        return normalizedLines.map(line =>
+            line.replace(/"([^"]*)"/g, (_, inner) => inner.trim())
+        );
+    };
+
+
+
+    const extractData = (rawText) => {
+        const lines = normalizeExcelText(rawText);
         const hotels = [];
         let flights = null;
         let transport = null;
