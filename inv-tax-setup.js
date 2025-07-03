@@ -556,8 +556,9 @@ function processInvoiceData(data) {
 
 
 
-    const lines = data.split("\n").map(line => line.trim()).filter(line => line);
-    const { hotels, flights, transport, visa, total } = extractData(lines);
+    /* Pass all filtered text to a function to extract the data */
+    const { hotels, flights, transport, visa, total } = extractData(data);
+    
 
     document.getElementById("invoice_company_main_table_div_id").innerHTML = "";
 
