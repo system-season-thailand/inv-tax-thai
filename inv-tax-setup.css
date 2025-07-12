@@ -505,9 +505,13 @@ body {
     top: 0;
     left: 0;
     z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-#import_saved_inv_comp_from_database_id button {
+#import_saved_inv_comp_from_database_id a {
+    text-decoration: none;
     background: linear-gradient(145deg, #4fc3f7, #f06292);
     color: white;
     font-size: 1.1rem;
@@ -521,7 +525,7 @@ body {
     transition: background 0.3s ease, transform 0.2s ease;
 }
 
-#import_saved_inv_comp_from_database_id button:hover {
+#import_saved_inv_comp_from_database_id a:hover {
     background: linear-gradient(145deg, #33beff, #ff4180);
     transform: scale(1.02);
 }
