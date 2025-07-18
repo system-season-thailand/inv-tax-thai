@@ -286,6 +286,11 @@ const importContentForSelectedName = (clickedGoogleSheetDataName) => {
         clickedGoogleSheetDataName.style.backgroundColor = 'rgb(0, 155, 0)';
         clickedGoogleSheetDataName.style.color = 'white';
     }
+
+
+
+    /* Call a function to allow the user to replace the logo image */
+    setupLogoImagePicker();
 };
 
 loadAllData();
