@@ -1853,8 +1853,8 @@ async function checkThePdfNameToDownload() {
         playSoundEffect('success');
 
 
-        /* Run a function to store the data in the google sheet */
-        sendDataToSupabase()
+        // Wait for Supabase storage to finish before continuing
+        await sendDataToSupabase();
 
 
 
