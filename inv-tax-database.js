@@ -132,22 +132,42 @@ function cleanHTML(html) {
 let allFetchedData = [];
 
 const fetchBatchFromSupabase = async () => {
-    const { data, error } = await supabase
-        .from('inv_tax_thai')
-        .select('*')
-        .range(0, 10000);
+    const batchSize = 1000;            // How many rows to fetch per request
+    let start = 0;                     // Starting index for the current batch
 
-    if (error) {
-        console.error("❌ Error fetching data from Supabase:", error);
-        return;
+    allFetchedData = [];               // Reset the global cache before refilling
+
+    while (true) {
+        const { data, error } = await supabase
+            .from('inv_tax_thai')
+            .select('*')
+            .range(start, start + batchSize - 1); // Fetch the current 1,000-row window
+
+        if (error) {
+            console.error("❌ Error fetching data from Supabase:", error);
+            break; // Abort on error – you may choose to retry depending on needs
+        }
+
+        if (!data || data.length === 0) {
+            // No more rows left to fetch
+            break;
+        }
+
+        // Map and push current batch into the global store
+        allFetchedData.push(
+            ...data.map(row => ({
+                name: row.name?.trim(),
+                content: row.inv_tax_thai_content?.trim()
+            }))
+        );
+
+        // If the batch was smaller than batchSize we reached the end
+        if (data.length < batchSize) {
+            break;
+        }
+
+        start += batchSize; // Move to the next batch
     }
-
-    allFetchedData = data.map(row => ({
-        name: row.name?.trim(),
-        content: row.inv_tax_indo_content?.trim()
-    }));
-
-
 };
 
 const loadAllData = async () => {
