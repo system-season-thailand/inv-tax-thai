@@ -16,7 +16,7 @@ const inv_comp_indo_fetchBatchFromSupabase = async () => {
 
     inv_comp_indo_allFetchedData = data.map(row => ({
         name: row.name?.trim(),
-        content: row.inv_company_indo_content?.trim()
+        content: row.inv_company_thai_content?.trim()
     }));
 
 };
@@ -161,12 +161,7 @@ const importMultipleSelectedInvCompIndoObjects = () => {
                 console.log("Invoice Number:", invNumberSpan.innerText.trim());
             }
     
-            // Optional: insert to DOM
-            // wholeInvoiceSection.innerHTML = matchedObject.content;
-    
-            // Optional: further function call
-            // createMultipleInvFunction();
-    
+
         } else {
             playSoundEffect('error');
         }
