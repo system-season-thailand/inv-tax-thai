@@ -102,22 +102,12 @@ async function sendDataToSupabase() {
         }
 
 
-
-
-
-
-        // Disable the button while processing
-        const button = document.getElementById('check_pdf_name_button');
-        button.style.pointerEvents = 'auto';
-        button.innerText = 'Download';
-
-        loadAllData();
-
     } catch (error) {
         console.error("🔥 Unexpected error:", error);
     }
-
 }
+
+
 
 // Function to clean HTML by removing unnecessary attributes and tags
 function cleanHTML(html) {
