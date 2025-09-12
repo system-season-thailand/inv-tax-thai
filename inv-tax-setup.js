@@ -157,6 +157,10 @@ const toTitleCase = (str) => {
 
 
 
+/* Detected invoice year (e.g., SEA-26-I-0001 -> 2026) */
+let detectedInvoiceYear = null;
+
+
 /* Function to convert a number to Roman numeral */
 function convertToRoman(num) {
     const romanNumerals = [
@@ -312,6 +316,20 @@ function processInvoiceData(data) {
 
 
 
+    /* Detect year from invoice number pattern like SEA-26-I-0001 -> 2026 */
+    (function detectYearFromInvoiceNumber() {
+        try {
+            const match = invoiceNo.match(/-(\d{2})-/);
+            if (match) {
+                const twoDigitYear = parseInt(match[1], 10);
+                // Assume 20xx for two-digit year
+                detectedInvoiceYear = 2000 + twoDigitYear;
+            }
+        } catch (e) {
+            // Leave detectedInvoiceYear as is if parsing fails
+        }
+    })();
+
 
     const parseDate = (dateStr) => {
         if (!dateStr || dateStr.trim() === "-") return "N/A";
@@ -331,7 +349,7 @@ function processInvoiceData(data) {
         const parts = dateStr.split(/[-/]/);
         if (parts.length === 2) {
             const [day, month] = parts;
-            const year = "2025";
+            const year = (detectedInvoiceYear || new Date().getFullYear()).toString();
 
             // Get the month's name from its number, or use the original month
             let monthName = Object.keys(months).find(key => months[key] === month) || month;
@@ -566,7 +584,7 @@ function processInvoiceData(data) {
         if (!startDate || !endDate) return "N/A";
 
         const now = new Date();
-        const currentYear = now.getFullYear();
+        const currentYear = detectedInvoiceYear || now.getFullYear();
 
         const monthReplacements = {
             "Jan": "Jan", "Feb": "Feb", "Mar": "Mar", "Apr": "Apr", "Mei": "May",
@@ -830,7 +848,7 @@ function processInvoiceData(data) {
         return monthMap[month] || month;
     };
 
-    const formatDateRange = (start, end, fallbackYear = "2025") => {
+    const formatDateRange = (start, end, fallbackYear = null) => {
         if (!start || !end) return "N/A";
 
         const [startDay, startMonthIndo] = start.split(" ");
@@ -839,10 +857,12 @@ function processInvoiceData(data) {
         const startMonth = parseIndoMonthToEnglish(startMonthIndo);
         const endMonth = parseIndoMonthToEnglish(endMonthIndo || startMonthIndo);
 
+        const resolvedYear = fallbackYear || (detectedInvoiceYear || new Date().getFullYear());
+
         if (startMonth === endMonth) {
-            return `${startDay} - ${endDay} ${startMonth} ${fallbackYear}`;
+            return `${startDay} - ${endDay} ${startMonth} ${resolvedYear}`;
         } else {
-            return `${startDay} ${startMonth} - ${endDay} ${endMonth} ${fallbackYear}`;
+            return `${startDay} ${startMonth} - ${endDay} ${endMonth} ${resolvedYear}`;
         }
     };
 
@@ -918,7 +938,7 @@ function processInvoiceData(data) {
             ? uniqueHotelLocations.join(", ")
             : '<span class="transportation_cities_text_options_class red_text_color_class">N/A</span>';
 
-        const defaultYear = 2025;
+        const defaultYear = detectedInvoiceYear || new Date().getFullYear();
 
         const monthReplacements = {
             "Mei": "May",
@@ -1003,7 +1023,7 @@ function processInvoiceData(data) {
         // Add all flight dates as <p> elements
         rowDiv.innerHTML = `
             <div>
-                <p contenteditable="true">${new Date().getFullYear()}</p>
+                <p contenteditable="true">${detectedInvoiceYear || new Date().getFullYear()}</p>
             </div>
             <div>
                 <p class="duplicate_this_element_class" contenteditable="true" style="padding: 25px 0">${data.visaDyasNumber}</p>
@@ -1876,7 +1896,7 @@ async function checkThePdfNameToDownload() {
         // Target all elements with the red text class
         const redTextElements = document.querySelectorAll('.red_text_color_class');
 
-        
+
         // Store the original color and set the text color to black
         redTextElements.forEach(element => {
             element.dataset.originalColor = element.style.color; // Save original color
