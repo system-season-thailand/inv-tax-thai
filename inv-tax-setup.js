@@ -1054,12 +1054,19 @@ function processInvoiceData(data) {
 
         // Format total number with commas (after minus 20 from the number as the tax)
         let tax = 0;
-        if (total > 7000) {
+
+        if (total >= 10000) {
+            tax = 150;
+        } else if (total >= 8000) {
+            tax = 130;
+        } else if (total >= 6000) {
+            tax = 110;
+        } else if (total >= 4000) {
+            tax = 90;
+        } else if (total >= 2000) {
             tax = 80;
-        } else if (total >= 4000 && total <= 7000) {
-            tax = 50;
         } else {
-            tax = 25;
+            tax = 60;
         }
         const formattedTotal = Number(total - tax).toLocaleString();
 
