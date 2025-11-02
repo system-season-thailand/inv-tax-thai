@@ -359,8 +359,8 @@ function processInvoiceData(data) {
             const lastLine = lines[lines.length - 1]; // Get the last row
 
 
-            // Regex to find SAR, USD, or IDR followed by a number
-            const match = lastLine.match(/(SAR|USD|IDR|RP)\s*([\d.,]+)/i);
+            // Regex to find SAR, USD, IDR, RP, or BAHT followed by a number (handle format like "SAR 1,880")
+            const match = lastLine.match(/(SAR|USD|IDR|RP|BAHT)\s*([\d.,]+)/i);
 
 
 
@@ -373,17 +373,17 @@ function processInvoiceData(data) {
 
 
 
-            // Check if any column contains "TICKET"
-            if (cols.some(col => /TICK/i.test(col))) {
-
-                const startDate = cols[4]?.trim();
-                const endDate = cols[5]?.trim();
+            // Check if column 1 contains "TICKET" or "TICKETS" (handle both formats)
+            if (/TICKET/i.test(cols[1] || "")) {
+                const startDate = cols[4]?.trim(); // CHECK IN column
+                const route = cols[3]?.trim() || ""; // ROOM/ROUTE column contains the flight route
                 const quantity = cols[7]?.trim();
 
                 flights = {
                     startDate: parseDate(startDate) || "N/A",
-                    endDate: parseDate(endDate) || "N/A",
+                    endDate: null, // Single date, not a range
                     quantity: quantity === "-" ? "2" : quantity || "2",
+                    route: route || null, // Store the route (e.g., "BKK-HKT")
                 };
             }
 
@@ -804,18 +804,40 @@ function processInvoiceData(data) {
         const flightDiv = document.createElement("div");
         flightDiv.id = "flight_tickets_row_div_id";
 
-        // Generate the flight dates dynamically
-        let flightDates = getFlightDates();
-
-        // If dynamic dates are "N/A", use startDate and endDate from `data`
-        if (flightDates === "N/A" && data.startDate && data.endDate) {
-            flightDates = formatDateRange(data.startDate, data.endDate);
+        // Determine flight dates - if route is stored, use single date format
+        let flightDates = "N/A";
+        if (data.route && data.startDate && data.startDate !== "N/A") {
+            // Format single date (e.g., "3 Des 2025")
+            const dateParts = data.startDate.split(" ");
+            if (dateParts.length >= 2) {
+                const monthReplacements = {
+                    "Mei": "May", "Agu": "Aug", "Okt": "Oct", "Des": "Dec"
+                };
+                const day = dateParts[0];
+                const monthRaw = dateParts[1];
+                const month = monthReplacements[monthRaw] || monthRaw;
+                flightDates = `${day} ${month} ${inferredInvoiceYear}`;
+            } else {
+                flightDates = `${data.startDate} ${inferredInvoiceYear}`;
+            }
+        } else {
+            // Generate the flight dates dynamically from hotel locations
+            flightDates = getFlightDates();
+            // If dynamic dates are "N/A", use startDate and endDate from `data`
+            if (flightDates === "N/A" && data.startDate && data.endDate) {
+                flightDates = formatDateRange(data.startDate, data.endDate);
+            }
         }
 
-
-        let getFlightDestinationText = getFlightDestination();
-        if (getFlightDestinationText === '') {
-            getFlightDestinationText = '<span class="flight_destination_text_options_class red_text_color_class">N/A</span>'
+        // Determine flight destination - use stored route if available
+        let getFlightDestinationText = "";
+        if (data.route) {
+            getFlightDestinationText = `<span class="flight_destination_text_options_class">${data.route}</span>`;
+        } else {
+            getFlightDestinationText = getFlightDestination();
+            if (getFlightDestinationText === '') {
+                getFlightDestinationText = '<span class="flight_destination_text_options_class red_text_color_class">N/A</span>'
+            }
         }
 
 
@@ -863,9 +885,37 @@ function processInvoiceData(data) {
 
         const uniqueHotelLocations = [...new Set(allHotelLocations)];
 
-        const allHotelLocationsSeparatedByComma = uniqueHotelLocations.length > 0
-            ? uniqueHotelLocations.join(", ")
-            : '<span class="transportation_cities_text_options_class red_text_color_class">N/A</span>';
+        // If no hotel locations, try to infer from flight route
+        let allHotelLocationsSeparatedByComma = "";
+        if (uniqueHotelLocations.length > 0) {
+            allHotelLocationsSeparatedByComma = uniqueHotelLocations.join(", ");
+        } else {
+            // Check if flight route exists in the DOM
+            const flightDestinationElement = document.querySelector("#flight_tickets_row_div_id .flight_destination_text_options_class");
+            if (flightDestinationElement) {
+                const routeText = flightDestinationElement.innerText.trim();
+                // Map airport codes to city names
+                const airportToCity = {
+                    "BKK": "Bangkok",
+                    "HKT": "Phuket",
+                    "KBV": "Krabi",
+                    "CNX": "Chiang Mai",
+                    "USM": "Koh Samui"
+                };
+                // Extract airport codes from route (e.g., "BKK-HKT" -> ["BKK", "HKT"])
+                const airportCodes = routeText.split(/[-]/).map(code => code.trim());
+                const cities = airportCodes
+                    .map(code => airportToCity[code] || null)
+                    .filter(city => city !== null);
+                if (cities.length > 0) {
+                    allHotelLocationsSeparatedByComma = cities.join(", ");
+                } else {
+                    allHotelLocationsSeparatedByComma = '<span class="transportation_cities_text_options_class red_text_color_class">N/A</span>';
+                }
+            } else {
+                allHotelLocationsSeparatedByComma = '<span class="transportation_cities_text_options_class red_text_color_class">N/A</span>';
+            }
+        }
 
         const defaultYear = detectedInvoiceYear || new Date().getFullYear();
 
