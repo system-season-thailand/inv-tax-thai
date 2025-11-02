@@ -376,12 +376,13 @@ function processInvoiceData(data) {
             // Check if column 1 contains "TICKET" or "TICKETS" (handle both formats)
             if (/TICKET/i.test(cols[1] || "")) {
                 const startDate = cols[4]?.trim(); // CHECK IN column
+                const endDate = cols[5]?.trim(); // CHECK OUT column
                 const route = cols[3]?.trim() || ""; // ROOM/ROUTE column contains the flight route
                 const quantity = cols[7]?.trim();
 
                 flights = {
                     startDate: parseDate(startDate) || "N/A",
-                    endDate: null, // Single date, not a range
+                    endDate: endDate && endDate !== "-" ? parseDate(endDate) : null, // May have both dates
                     quantity: quantity === "-" ? "2" : quantity || "2",
                     route: route || null, // Store the route (e.g., "BKK-HKT")
                 };
@@ -804,21 +805,36 @@ function processInvoiceData(data) {
         const flightDiv = document.createElement("div");
         flightDiv.id = "flight_tickets_row_div_id";
 
-        // Determine flight dates - if route is stored, use single date format
+        // Determine flight dates - if route is stored, format dates from data
         let flightDates = "N/A";
         if (data.route && data.startDate && data.startDate !== "N/A") {
-            // Format single date (e.g., "3 Des 2025")
-            const dateParts = data.startDate.split(" ");
-            if (dateParts.length >= 2) {
-                const monthReplacements = {
-                    "Mei": "May", "Agu": "Aug", "Okt": "Oct", "Des": "Dec"
-                };
-                const day = dateParts[0];
-                const monthRaw = dateParts[1];
-                const month = monthReplacements[monthRaw] || monthRaw;
-                flightDates = `${day} ${month} ${inferredInvoiceYear}`;
+            const monthReplacements = {
+                "Mei": "May", "Agu": "Aug", "Okt": "Oct", "Des": "Dec"
+            };
+
+            // Parse start date
+            const startParts = data.startDate.split(" ");
+            const startDay = startParts[0];
+            const startMonthRaw = startParts[1];
+            const startMonth = monthReplacements[startMonthRaw] || startMonthRaw;
+
+            // If end date exists, format as range (e.g., "3 - 6 Dec 2025")
+            if (data.endDate && data.endDate !== "N/A" && data.endDate !== null) {
+                const endParts = data.endDate.split(" ");
+                const endDay = endParts[0];
+                const endMonthRaw = endParts[1];
+                const endMonth = monthReplacements[endMonthRaw] || endMonthRaw;
+
+                // If same month, show "3 - 6 Dec 2025"
+                if (startMonth === endMonth) {
+                    flightDates = `${startDay} - ${endDay} ${startMonth} ${inferredInvoiceYear}`;
+                } else {
+                    // Different months: "3 Dec - 6 Jan 2025"
+                    flightDates = `${startDay} ${startMonth} - ${endDay} ${endMonth} ${inferredInvoiceYear}`;
+                }
             } else {
-                flightDates = `${data.startDate} ${inferredInvoiceYear}`;
+                // Single date (e.g., "3 Dec 2025")
+                flightDates = `${startDay} ${startMonth} ${inferredInvoiceYear}`;
             }
         } else {
             // Generate the flight dates dynamically from hotel locations
@@ -902,13 +918,23 @@ function processInvoiceData(data) {
                     "CNX": "Chiang Mai",
                     "USM": "Koh Samui"
                 };
-                // Extract airport codes from route (e.g., "BKK-HKT" -> ["BKK", "HKT"])
-                const airportCodes = routeText.split(/[-]/).map(code => code.trim());
-                const cities = airportCodes
-                    .map(code => airportToCity[code] || null)
-                    .filter(city => city !== null);
-                if (cities.length > 0) {
-                    allHotelLocationsSeparatedByComma = cities.join(", ");
+                // Extract airport codes from route (handle "BKK-HKT, HKT-BKK" -> extract unique codes)
+                const uniqueAirportCodes = new Set();
+                // Split by comma first to handle multiple routes
+                const routeSegments = routeText.split(',').map(seg => seg.trim());
+                routeSegments.forEach(segment => {
+                    // Split each segment by dash
+                    const codes = segment.split('-').map(code => code.trim());
+                    codes.forEach(code => uniqueAirportCodes.add(code));
+                });
+                // Convert airport codes to cities and remove duplicates
+                const uniqueCities = [...new Set(
+                    Array.from(uniqueAirportCodes)
+                        .map(code => airportToCity[code])
+                        .filter(city => city !== null && city !== undefined)
+                )];
+                if (uniqueCities.length > 0) {
+                    allHotelLocationsSeparatedByComma = uniqueCities.join(", ");
                 } else {
                     allHotelLocationsSeparatedByComma = '<span class="transportation_cities_text_options_class red_text_color_class">N/A</span>';
                 }
