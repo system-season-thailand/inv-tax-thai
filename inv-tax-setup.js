@@ -212,6 +212,21 @@ document.getElementById("dataInput").oninput = function () {
 function processInvoiceData(data) {
     const rows = data.trim().split("\n");
 
+
+
+
+    // Extract two-digit year from the full invoice code (e.g., SEA-26-I-0001 -> 2026)
+    const invoiceLineRaw = rows[0].startsWith("GUEST BY") ? (rows[1] || "") : (rows[2] || "");
+    const invoiceCode = invoiceLineRaw.split(":")[1]?.trim() || "";
+    const codeParts = invoiceCode.split("-");
+    const twoDigitYearFromCode = codeParts.length >= 2 ? codeParts[1] : null;
+    const inferredInvoiceYear = twoDigitYearFromCode && /^\d{2}$/.test(twoDigitYearFromCode)
+        ? 2000 + parseInt(twoDigitYearFromCode, 10)
+        : new Date().getFullYear();
+
+
+
+
     /* Just in case the star cell copied was gust by of company by */
     let guestBy, invoiceNo, clientName;
 
