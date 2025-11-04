@@ -239,7 +239,7 @@ const importContentForSelectedName = (clickedGoogleSheetDataName) => {
         makeDivContentEditable();
         // Call the function to enable the floating options functionality
         setupFloatingOptions(
-            ["Jakarta", "Puncak", "Bali", "Bandung", "Lombok"],
+            ["Bangkok", "Phuket", "Krabi", "Pattaya", "Koh Samui", "Chiang Mai"],
             "location_text_options_class",
             option => option
         );
@@ -249,7 +249,7 @@ const importContentForSelectedName = (clickedGoogleSheetDataName) => {
             option => `${option} Person`
         );
         setupFloatingOptions(
-            ["CGK-DPS\nRETURN", "CGK-DPS", "DPS-CGK"],
+            ["BKK-HKT\nRETURN", "BKK-HKT", "HKT-BKK"],
             "flight_destination_text_options_class",
             option => option
         );
