@@ -1,8 +1,5 @@
-const supabaseUrl = 'https://lpyfcvjljejmxgoynbxb.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxweWZjdmpsamVqbXhnb3luYnhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY4ODk4OTYsImV4cCI6MjA2MjQ2NTg5Nn0.Ml7ICH8BoBZFbdRW-hOaN3OFX5j386QR_z0C4KmTt5k';
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
 let new_or_imported_inv_company_variable = 'new_invoice_company';
+
 
 async function sendDataToSupabase() {
 

@@ -300,9 +300,39 @@
 
 
 
-
     <!-- Supabase JS Library -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Supabase Import Databse Project -->
+    <script>
+        // Wait for Supabase library to load and initialize client
+        (function () {
+            const supabaseUrl = 'https://lpyfcvjljejmxgoynbxb.supabase.co';
+            const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxweWZjdmpsamVqbXhnb3luYnhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY4ODk4OTYsImV4cCI6MjA2MjQ2NTg5Nn0.Ml7ICH8BoBZFbdRW-hOaN3OFX5j386QR_z0C4KmTt5k'; // truncated for safety
+
+            function initSupabase() {
+                // The CDN exposes supabase library - access it from window
+                if (window.supabase && typeof window.supabase.createClient === 'function') {
+                    // Create client and store it
+                    const client = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+                    // Store client on window for backup access
+                    window.supabaseClient = client;
+
+                    // Replace window.supabase with the client (the library is no longer needed)
+                    // This makes 'supabase' available globally as the client
+                    window.supabase = client;
+                } else {
+                    // Retry if library not loaded yet
+                    setTimeout(initSupabase, 50);
+                }
+            }
+
+            // Start initialization
+            initSupabase();
+        })();
+    </script>
+
 
 
 
