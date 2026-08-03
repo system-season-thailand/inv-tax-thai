@@ -361,6 +361,9 @@ const invCompImportContentForSelectedName = async (clickedInvCompDataName) => {
     }
 
 
+    /* Show the loading before the reading and the rebuilding hold the page still */
+    await showInvImportLoading();
+
     // Read the saved content of the selected name
     const selectedName = clickedInvCompDataName.getAttribute('data-original-name') || clickedInvCompDataName.innerText.trim();
     const importedContent = await invCompNamesLoader.fetchContentForName(selectedName);
@@ -368,6 +371,7 @@ const invCompImportContentForSelectedName = async (clickedInvCompDataName) => {
     if (!importedContent) {
         // Play a sound effect
         playSoundEffect('error');
+        hideInvImportLoading();
         return;
     }
 
@@ -475,6 +479,10 @@ const invCompImportContentForSelectedName = async (clickedInvCompDataName) => {
 
     /* Let the download know this invoice is ready to be stored in the inv tax DB table */
     new_or_imported_inv_company_variable = 'imported_inv_comp_company';
+
+
+    /* The invoice is fully rebuilt now */
+    hideInvImportLoading();
 };
 
 

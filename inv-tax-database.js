@@ -143,6 +143,9 @@ const importContentForSelectedName = async (clickedGoogleSheetDataName) => {
 
     if (clickedGoogleSheetDataName.style.backgroundColor === 'rgb(0, 155, 0)') {
 
+        /* Show the loading before the reading and the rebuilding hold the page still */
+        await showInvImportLoading();
+
         // Read the saved content of the selected name
         const selectedName = clickedGoogleSheetDataName.getAttribute('data-original-name') || clickedGoogleSheetDataName.innerText.trim();
         const importedContent = await invTaxNamesLoader.fetchContentForName(selectedName);
@@ -150,6 +153,7 @@ const importContentForSelectedName = async (clickedGoogleSheetDataName) => {
         if (!importedContent) {
             // Play a sound effect
             playSoundEffect('error');
+            hideInvImportLoading();
             return;
         }
 
@@ -211,6 +215,10 @@ const importContentForSelectedName = async (clickedGoogleSheetDataName) => {
 
 
         new_or_imported_inv_company_variable = 'imported_inv_company';
+
+
+        /* The invoice is fully rebuilt now */
+        hideInvImportLoading();
 
     } else {
 
