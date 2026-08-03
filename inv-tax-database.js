@@ -120,114 +120,45 @@ function cleanHTML(html) {
     return html.replace(/\s+/g, ' ').trim();
 }
 
-// Global array to store all fetched data
+/* Global array holding the name of every saved inv tax (filled page by page) */
 let allFetchedData = [];
 
-const fetchBatchFromSupabase = async () => {
-    const batchSize = 1000;            // How many rows to fetch per request
-    let start = 0;                     // Starting index for the current batch
-
-    allFetchedData = [];               // Reset the global cache before refilling
-
-    while (true) {
-        const { data, error } = await supabase
-            .from('inv_tax_thai')
-            .select('*')
-            .range(start, start + batchSize - 1); // Fetch the current 1,000-row window
-
-        if (error) {
-            console.error("❌ Error fetching data from Supabase:", error);
-            break; // Abort on error – you may choose to retry depending on needs
-        }
-
-        if (!data || data.length === 0) {
-            // No more rows left to fetch
-            break;
-        }
-
-        // Map and push current batch into the global store
-        allFetchedData.push(
-            ...data.map(row => ({
-                name: row.name?.trim(),
-                content: row.inv_tax_thai_content?.trim()
-            }))
-        );
-
-        // If the batch was smaller than batchSize we reached the end
-        if (data.length < batchSize) {
-            break;
-        }
-
-        start += batchSize; // Move to the next batch
-    }
-};
-
-const loadAllData = async () => {
-    const container = document.getElementById("all_supabase_stored_inv_tax_data_names_for_importing_data_div");
-
-    if (!container) {
-        console.error("❌ Could not find #all_supabase_stored_inv_tax_data_names_for_importing_data_div");
-        return;
-    }
-
-    container.innerHTML = '';
-
-    await fetchBatchFromSupabase(); // assumes it fills allFetchedData globally
-
-
-    const allDataSet = new Set();
-    const batchHTMLElements = [];
-
-    allFetchedData.forEach(row => {
-        if (row.name && !allDataSet.has(row.name)) {
-            allDataSet.add(row.name);
-
-            const h3 = document.createElement("h3");
-            h3.textContent = row.name;
-
-            h3.onclick = function () {
-                importContentForSelectedName(this);
-            };
-
-            batchHTMLElements.push(h3);
-        }
-    });
-
-    if (batchHTMLElements.length === 0) {
-        console.warn("⚠️ No unique entries found to display.");
-    } else {
-        // Reverse the order before appending
-        batchHTMLElements.reverse().forEach(el => {
-            container.appendChild(el);
-        });
-    }
-
-    // Optional: trigger input filter if any
-    document.querySelectorAll('.search_bar_input_class').forEach(input => {
-        if (input.value.trim()) {
-            let event = new Event('input', { bubbles: true });
-            input.dispatchEvent(event);
-        }
-    });
-};
+/* The newest names show up right away, the older ones keep loading in the background */
+const invTaxNamesLoader = createInvNamesLoader({
+    tableName: 'inv_tax_thai',
+    contentColumn: 'inv_tax_thai_content',
+    orderColumn: 'inv_tax_user_current_date',
+    containerId: 'all_supabase_stored_inv_tax_data_names_for_importing_data_div',
+    namesStore: allFetchedData,
+    onNameClick: (clickedName) => importContentForSelectedName(clickedName),
+    /* The names dropdown is shared with the invoice companies */
+    isActive: () => currentInvNamesDropdownMode === 'inv_tax'
+});
 
 // Function to import content for selected name
-const importContentForSelectedName = (clickedGoogleSheetDataName) => {
+const importContentForSelectedName = async (clickedGoogleSheetDataName) => {
     const wholeInvoiceSection = document.getElementById("whole_invoice_company_section_id");
 
 
 
     if (clickedGoogleSheetDataName.style.backgroundColor === 'rgb(0, 155, 0)') {
 
-        // Find the object that matches the selected name
-        let foundObject = allFetchedData.find(obj => obj.name === clickedGoogleSheetDataName.innerText.trim());
+        // Read the saved content of the selected name
+        const selectedName = clickedGoogleSheetDataName.getAttribute('data-original-name') || clickedGoogleSheetDataName.innerText.trim();
+        const importedContent = await invTaxNamesLoader.fetchContentForName(selectedName);
+
+        if (!importedContent) {
+            // Play a sound effect
+            playSoundEffect('error');
+            return;
+        }
 
         // Play a sound effect
         playSoundEffect('success');
 
 
         /* Insert the imported data into the 'whole_invoice_company_section_id' */
-        wholeInvoiceSection.innerHTML = foundObject.content;
+        wholeInvoiceSection.innerHTML = importedContent;
 
 
         /* Hide the google sheet data */
@@ -283,15 +214,8 @@ const importContentForSelectedName = (clickedGoogleSheetDataName) => {
 
     } else {
 
-        // Get all <h3> elements inside the 'all_supabase_stored_inv_tax_data_names_for_importing_data_div' div
-        let allGoogleSheetStoredDataNamesForImportingDataDiv = document.querySelectorAll('#all_supabase_stored_inv_tax_data_names_for_importing_data_div h3');
-
-
-        // Loop through each <h3> element to reset their styles
-        allGoogleSheetStoredDataNamesForImportingDataDiv.forEach(function (dataName) {
-            dataName.style.backgroundColor = 'white';
-            dataName.style.color = 'black';
-        });
+        // Reset the styles of every name, the searched out ones included (only one selected name at a time)
+        invTaxNamesLoader.clearSelection();
 
 
         // Set the background color and text color of the clicked <h3> element
@@ -305,4 +229,4 @@ const importContentForSelectedName = (clickedGoogleSheetDataName) => {
     setupLogoImagePicker();
 };
 
-loadAllData();
+invTaxNamesLoader.start();

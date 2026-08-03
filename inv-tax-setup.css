@@ -107,6 +107,7 @@ body {
 
 /* Button */
 #all_inv_office_insert_data_content button {
+    margin: 0 6px;
     padding: 12px 28px;
     background: linear-gradient(145deg, #4fc3f7, #f06292);
     color: white;

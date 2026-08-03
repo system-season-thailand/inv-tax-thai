@@ -1743,8 +1743,6 @@ function showOverlay(clickedInputDropdownIdName) {
 
     let clickedInputDropdown = document.getElementById(clickedInputDropdownIdName);
 
-    // Store the reference to the last clicked input field
-    lastClickedClintMovementsCityInput = document.getElementById(event.target.id);
     clickedInputDropdown.classList.add('show'); // Show the clicked input dropdown
     clickedInputDropdown.style.transition = 'transform 0.2s ease-in-out'; // Ensure transform transition is smooth
 

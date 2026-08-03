@@ -35,6 +35,7 @@
 
         <textarea id="dataInput" placeholder="Paste your data here"></textarea>
         <button onclick="playSoundEffect('click'); deleteTextAre()">Reset</button>
+        <button onclick="playSoundEffect('click'); openInvCompImportDropdown()">Import Inv Company</button>
 
     </div>
 
@@ -183,7 +184,8 @@
             <p style="font-weight: bolder; margin-bottom: 35px;">BANK ACCOUNT:</p>
 
 
-            <pre style="font-weight: bolder;">A/C Name                                       : Season Travel Co., Ltd.</pre>
+            <pre
+                style="font-weight: bolder;">A/C Name                                       : Season Travel Co., Ltd.</pre>
             <pre style="font-weight: bolder;">Bank Name                                     : KASIKORN</pre>
             <pre style="font-weight: bolder;">Account Number Baht                     : 1981223000</pre>
             <pre style="font-weight: bolder;">Swift                                               : KASITHВК</pre>
@@ -237,8 +239,7 @@
     </div>
 
     <div id="import_saved_data_from_database_id">
-        <button
-            onclick="playSoundEffect('click'); showOverlay('import_supabase_inv_tax_data_names_dropdown')">Import</button>
+        <button onclick="playSoundEffect('click'); openInvTaxImportDropdown()">Import Inv Tax</button>
     </div>
 
     <div id="import_saved_inv_comp_from_database_id">
@@ -270,30 +271,6 @@
 
 
 
-
-
-
-
-    <!-- Dropdown Div For Inv Comp Indonesia -->
-    <div id="import_supabase_inv_comp_indo_data_names_dropdown"
-        class="searchable_names_dropdown_class google_sheet_dropdown_div_class">
-
-        <div class="search_bar_div_class">
-            <input type="text" id="import_google_sheet_data_names_search_bar_input_id" class="search_bar_input_class"
-                placeholder="Search" style="direction: ltr;">
-        </div>
-
-
-
-        <p onclick="importMultipleSelectedInvCompIndoObjects()">Done</p>
-
-
-
-        <div id="all_supabase_stored_inv_comp_indo_data_names_for_importing_data_div"
-            class="company_names_options_dropdown_class">
-            <!-- Dynamic JS Code Here -->
-        </div>
-    </div>
 
 
 
@@ -346,6 +323,8 @@
 
 
 
+    <script src="inv-names-paged-loader.js"></script>
+    <script src="inv-comp-database.js"></script>
     <script src="inv-tax-database.js"></script>
     <script src="inv-tax-setup.js"></script>
 </body>
