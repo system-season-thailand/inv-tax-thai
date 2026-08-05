@@ -24,6 +24,109 @@ const INV_NAMES_BACKGROUND_PAGES_AT_ONCE = 3;
 
 
 /* ==========================================================================
+   The animated "Loading Data" status
+
+   It stands in for the "No matching data found." text for as long as pages of
+   the table are still on their way, so a search never tells the user a name
+   does not exist while the page holding it has not arrived yet.
+   ========================================================================== */
+
+const INV_NAMES_LOADING_INDICATOR_STYLE_ID = 'inv_names_loading_indicator_style';
+
+const addInvNamesLoadingIndicatorStyle = () => {
+    if (document.getElementById(INV_NAMES_LOADING_INDICATOR_STYLE_ID)) return;
+
+    const loadingIndicatorStyle = document.createElement('style');
+    loadingIndicatorStyle.id = INV_NAMES_LOADING_INDICATOR_STYLE_ID;
+    loadingIndicatorStyle.textContent = `
+        .inv_names_loading_indicator {
+            width: 100%;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            direction: ltr;
+            font-weight: bold;
+            box-sizing: border-box;
+        }
+
+        .inv_names_loading_indicator_spinner {
+            width: 18px;
+            height: 18px;
+            flex: none;
+            border: 3px solid rgba(0, 0, 0, 0.15);
+            border-top-color: rgb(0, 155, 0);
+            border-radius: 50%;
+            animation: inv_names_loading_indicator_spin 0.8s linear infinite;
+        }
+
+        .inv_names_loading_indicator_text {
+            animation: inv_names_loading_indicator_fade 1.4s ease-in-out infinite;
+        }
+
+        .inv_names_loading_indicator_dots {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .inv_names_loading_indicator_dots i {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background-color: currentColor;
+            animation: inv_names_loading_indicator_bounce 1.4s ease-in-out infinite;
+        }
+
+        .inv_names_loading_indicator_dots i:nth-child(2) { animation-delay: 0.2s; }
+        .inv_names_loading_indicator_dots i:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes inv_names_loading_indicator_spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes inv_names_loading_indicator_fade {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.45; }
+        }
+
+        @keyframes inv_names_loading_indicator_bounce {
+            0%, 80%, 100% { opacity: 0.25; transform: translateY(0); }
+            40% { opacity: 1; transform: translateY(-4px); }
+        }
+
+        /* Users who asked their system for less movement only get the fading text */
+        @media (prefers-reduced-motion: reduce) {
+            .inv_names_loading_indicator_spinner,
+            .inv_names_loading_indicator_dots i {
+                animation: none;
+            }
+        }
+    `;
+
+    document.head.appendChild(loadingIndicatorStyle);
+};
+
+
+const buildInvNamesLoadingIndicator = () => {
+    addInvNamesLoadingIndicatorStyle();
+
+    const loadingIndicator = document.createElement('div');
+    loadingIndicator.className = 'inv_names_loading_indicator';
+    loadingIndicator.innerHTML = `
+        <span class="inv_names_loading_indicator_spinner"></span>
+        <span class="inv_names_loading_indicator_text">Loading Data</span>
+        <span class="inv_names_loading_indicator_dots"><i></i><i></i><i></i></span>
+    `;
+
+    return loadingIndicator;
+};
+
+
+
+
+/* ==========================================================================
    Showing the year of the invoice in front of its name ("26__1584 Mr. ...")
    ========================================================================== */
 
@@ -77,6 +180,9 @@ const createInvNamesLoader = ({
         hasMore: true,
         started: false,
         firstPageLoaded: false,
+        /* False for as long as pages are still being fetched, which is what keeps
+           the "No matching data found." text away from a half filled array */
+        allNamesLoaded: false,
         firstPageNames: [],
         addedNames: new Set(),
         nameLabels: new Map(),
@@ -129,12 +235,7 @@ const createInvNamesLoader = ({
         const container = getContainer();
         if (!container || container.querySelector('.inv_names_loading_indicator')) return;
 
-        const loadingIndicator = document.createElement("div");
-        loadingIndicator.className = 'inv_names_loading_indicator';
-        loadingIndicator.textContent = 'Loading Data ⟳';
-        loadingIndicator.style.cssText = 'padding: 12px; text-align: center; font-weight: bold;';
-
-        container.appendChild(loadingIndicator);
+        container.appendChild(buildInvNamesLoadingIndicator());
     };
 
 
@@ -146,6 +247,14 @@ const createInvNamesLoader = ({
         container.innerHTML = '';
 
         if (names.length === 0) {
+            /* Nothing matched, but pages are still arriving, so the name the user is
+               after may simply not be in the array yet. The search runs again on its
+               own once the last page lands, and only then can the miss be reported */
+            if (!loaderState.allNamesLoaded) {
+                showLoadingIndicator();
+                return;
+            }
+
             container.insertAdjacentHTML('beforeend', '<p>No matching data found.</p>');
             return;
         }
@@ -323,6 +432,12 @@ const createInvNamesLoader = ({
             }
         }
 
+        loaderState.allNamesLoaded = true;
+
+        /* The array is complete now, so a list that is still showing the animated status
+           has to be rendered one last time to settle on its real answer */
+        if (getContainer()?.querySelector('.inv_names_loading_indicator')) applySearchFilter();
+
         resolveAllNamesLoaded();
     };
 
@@ -359,6 +474,7 @@ const createInvNamesLoader = ({
         loaderState.hasMore = true;
         loaderState.started = false;
         loaderState.firstPageLoaded = false;
+        loaderState.allNamesLoaded = false;
         loaderState.firstPageNames = [];
         loaderState.addedNames.clear();
         loaderState.nameLabels.clear();

@@ -93,7 +93,7 @@ function openInvCompImportDropdown() {
 
 
 /* ==========================================================================
-   Building the inv tax number out of the invoice company month & year
+   Building the inv tax number out of the invoice company month, year & number
    ========================================================================== */
 
 const invCompMonthNames = {
@@ -165,7 +165,21 @@ const getInvTaxMonthAndYearFromRows = () => {
 };
 
 
-/* The last part of the number keeps running over all the months of the same year */
+/* The last part of the number is the number of the invoice company itself, which it
+   stores next to its month and its year for this very import */
+const getInvTaxNumberSequenceFromInvComp = (importedInvCompDiv) => {
+    const storedInvNumber = readInvCompStoredValue(importedInvCompDiv, 'store_google_sheet_inv_number');
+
+    /* A hand edited invoice company can keep a revision marker next to it ("0290 R1") */
+    const invNumberDigits = (storedInvNumber.match(/\d+/) || [])[0];
+    if (!invNumberDigits || parseInt(invNumberDigits, 10) === 0) return '';
+
+    return invNumberDigits.padStart(4, '0');
+};
+
+
+/* Only used for the invoice companies that were saved before their number was stored.
+   The last part of the number keeps running over all the months of the same year */
 const getNextInvTaxNumberSequence = async (invNumberYearStart) => {
     /* The inv tax names are loaded page by page, so the last used number is
        only known once the background loading is over */
@@ -189,7 +203,8 @@ const getNextInvTaxNumberSequence = async (invNumberYearStart) => {
 };
 
 
-/* Builds a number like "FID-26-I-0001" */
+/* Builds a number like "FID-26-I-0001", where only the prefix is fixed and the year,
+   the month and the number all come from the imported invoice company */
 const buildInvTaxNumberFromInvComp = async (importedInvCompDiv) => {
     let month = invCompMonthToNumber(readInvCompStoredValue(importedInvCompDiv, 'store_google_sheet_inv_orignal_month_value'));
     let year = invCompYearToNumber(readInvCompStoredValue(importedInvCompDiv, 'store_google_sheet_inv_orignal_year_value'));
@@ -208,7 +223,30 @@ const buildInvTaxNumberFromInvComp = async (importedInvCompDiv) => {
 
     const invNumberYearStart = `${INV_TAX_NUMBER_PREFIX}-${String(year).slice(-2)}-`;
 
-    return `${invNumberYearStart}${convertToRoman(month)}-${await getNextInvTaxNumberSequence(invNumberYearStart)}`;
+    /* The stored number is the one the invoice company was given, so the inv tax invoice
+       keeps it. Only an invoice company that never stored it falls back on the next
+       free number of the year */
+    const invNumberSequence = getInvTaxNumberSequenceFromInvComp(importedInvCompDiv)
+        || await getNextInvTaxNumberSequence(invNumberYearStart);
+
+    return `${invNumberYearStart}${convertToRoman(month)}-${invNumberSequence}`;
+};
+
+
+/* The revision of the imported invoice company ("26__0283-Rev1 Mr. Alwakr ..." -> "Rev1"),
+   so the inv tax invoice ends up on the same revision ("FID-26-VIII-1595-Rev1").
+
+   It is only read right after the number of the invoice company, so a "Rev1" sitting
+   anywhere else ("26__0283 Mr. Alwakr ... Rev1") is not a revision */
+const getInvCompRevisionMarker = (invCompName) => {
+    /* The shown text keeps the year in front of the name ("26__0283-Rev1 ...") */
+    const savedName = cleanInvoiceNameSearchText((invCompName || '').trim());
+
+    /* The marker is written in many shapes ("-Rev1", " Rev 1", "-rev."), and the letters
+       have to end there, so a guest name like "Reverend" is never read as one */
+    const foundRevision = savedName.match(/^\d+\s*[-\s]\s*rev\.?\s*(\d*)(?![a-z0-9])/i);
+
+    return foundRevision ? `Rev${foundRevision[1]}` : '';
 };
 
 
@@ -402,8 +440,13 @@ const invCompImportContentForSelectedName = async (clickedInvCompDataName) => {
 
 
 
-    /* NO: (built out of the month & the year stored in the invoice company) */
-    document.getElementById('current_used_inv_tax_p_id').innerText = await buildInvTaxNumberFromInvComp(importedInvCompDiv);
+    /* NO: (built out of the month, the year & the number stored in the invoice company,
+       and carrying the revision of the invoice company when it has one) */
+    const invTaxNumber = await buildInvTaxNumberFromInvComp(importedInvCompDiv);
+    const invCompRevisionMarker = getInvCompRevisionMarker(selectedName);
+
+    document.getElementById('current_used_inv_tax_p_id').innerText =
+        (invTaxNumber && invCompRevisionMarker) ? `${invTaxNumber}-${invCompRevisionMarker}` : invTaxNumber;
 
 
 
