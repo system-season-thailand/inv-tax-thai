@@ -70,6 +70,11 @@ function playSoundEffect(soundName) {
 /* Function to reset the value of the textarea */
 deleteTextAre = function () {
     document.getElementById("dataInput").value = '';
+
+    /* The transfer amount goes with it, so the TOTAL row falls back on the total the
+       invoice was built with */
+    document.getElementById("transfer_amount_input_id").value = '';
+    refreshInvTaxTotalPrice();
 }
 
 
@@ -197,6 +202,113 @@ function openPdfDownloadBox() {
 
 
 
+
+
+
+
+/* ==========================================================================
+   The transfer amount
+
+   The price of the TOTAL row is the amount the office transferred minus its tax,
+   and that amount is the only thing the price is ever built from. While it is left
+   empty the row shows three red question marks instead of a price, so an invoice is
+   never handed out with a total nobody typed.
+   ========================================================================== */
+
+/* Stands in for the price while no transfer amount has been typed */
+const INV_TAX_MISSING_TOTAL_PRICE = '<span style="color: red;">???</span>';
+
+
+/* The tax that is taken off the total */
+const getInvTaxTaxOfTotal = (total) => {
+    if (total >= 10000) return 150;
+    if (total >= 8000) return 130;
+    if (total >= 6000) return 110;
+    if (total >= 4000) return 90;
+    if (total >= 2000) return 80;
+
+    return 60;
+};
+
+
+/* The total minus its tax, with the thousands separators ("4,910") */
+const formatInvTaxTotal = (total) => {
+    const totalNumber = Number(total);
+
+    return Number(totalNumber - getInvTaxTaxOfTotal(totalNumber)).toLocaleString();
+};
+
+
+/* A typed amount can carry its thousands separators ("12,500"), so those are dropped.
+   Anything else that is not a number of its own is no amount at all */
+const readInvTaxTransferAmount = () => {
+    const typedAmount = (document.getElementById('transfer_amount_input_id')?.value || '').replace(/[,\s]/g, '');
+    const transferAmount = Number(typedAmount);
+
+    return (Number.isFinite(transferAmount) && transferAmount > 0) ? transferAmount : null;
+};
+
+
+/* The whole price the TOTAL row shows, e.g. "SAR                        4,910",
+   or the three red question marks while there is no amount to build it from */
+const buildInvTaxTotalPriceText = () => {
+    const transferAmount = readInvTaxTransferAmount();
+
+    return transferAmount === null
+        ? INV_TAX_MISSING_TOTAL_PRICE
+        : `SAR${'&nbsp;'.repeat(24)}${formatInvTaxTotal(transferAmount)}`;
+};
+
+
+/* Rewrites the price of the TOTAL row that is already on the page */
+const refreshInvTaxTotalPrice = () => {
+    const priceElement = document.querySelector('#inv_tax_total_price_div_id p');
+    if (!priceElement) return;
+
+    priceElement.innerHTML = buildInvTaxTotalPriceText();
+};
+
+
+/* Keeps everything that is not a digit out of the transfer amount and puts the thousands
+   separators in while it is being typed ("12500" -> "12,500").
+
+   Rewriting the value moves the caret to the end of the input, so the digits in front of
+   it are counted first and it is put back after the same ones */
+const formatInvTaxTransferAmountInput = () => {
+    const transferAmountInput = document.getElementById('transfer_amount_input_id');
+    if (!transferAmountInput) return;
+
+    const typedValue = transferAmountInput.value;
+    const caretPosition = transferAmountInput.selectionStart ?? typedValue.length;
+    const digitsBeforeCaret = typedValue.slice(0, caretPosition).replace(/\D/g, '').length;
+
+    /* A leading zero is dropped, but a lone "0" is left alone so it can still be typed */
+    const digits = typedValue.replace(/\D/g, '').replace(/^0+(?=\d)/, '');
+
+    /* Grouped without Number(), so a very long amount keeps every digit it was given */
+    const formattedValue = digits.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+    if (formattedValue === typedValue) return;
+
+    transferAmountInput.value = formattedValue;
+
+    /* Walk over the new text until the same number of digits has been passed */
+    let newCaretPosition = 0;
+    let digitsPassed = 0;
+
+    while (newCaretPosition < formattedValue.length && digitsPassed < digitsBeforeCaret) {
+        if (/\d/.test(formattedValue[newCaretPosition])) digitsPassed++;
+        newCaretPosition++;
+    }
+
+    transferAmountInput.setSelectionRange(newCaretPosition, newCaretPosition);
+};
+
+
+document.getElementById("transfer_amount_input_id").oninput = function () {
+    formatInvTaxTransferAmountInput();
+    refreshInvTaxTotalPrice();
+};
 
 
 
@@ -1064,7 +1176,7 @@ function processInvoiceData(data) {
 
 
 
-    const createTotalPriceRow = (total) => {
+    const createTotalPriceRow = () => {
         const totalDiv = document.createElement("div");
         totalDiv.id = "total_price_row_div_id";
 
@@ -1072,23 +1184,9 @@ function processInvoiceData(data) {
 
 
 
-        // Format total number with commas (after minus 20 from the number as the tax)
-        let tax = 0;
-
-        if (total >= 10000) {
-            tax = 150;
-        } else if (total >= 8000) {
-            tax = 130;
-        } else if (total >= 6000) {
-            tax = 110;
-        } else if (total >= 4000) {
-            tax = 90;
-        } else if (total >= 2000) {
-            tax = 80;
-        } else {
-            tax = 60;
-        }
-        const formattedTotal = Number(total - tax).toLocaleString();
+        /* The typed transfer amount is the only thing the price is built from, so the row
+           starts on the three red question marks until one is typed */
+        const totalPriceText = buildInvTaxTotalPriceText();
 
 
 
@@ -1101,7 +1199,7 @@ function processInvoiceData(data) {
                 <p class="duplicate_this_element_class">TOTAL</p>
             </div>
             <div id="inv_tax_total_price_div_id" style="border-right: 0.5px solid black;">
-                <p style="padding: 5px 0">SAR&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${formattedTotal}</p>
+                <p style="padding: 5px 0">${totalPriceText}</p>
             </div>
         `;
 
@@ -1116,7 +1214,9 @@ function processInvoiceData(data) {
     if (flights) createFlightRow(flights);
     if (transport) createTransportationRow(transport);
     if (visa) createVisaRow(visa);
-    if (total) createTotalPriceRow(total);
+    /* The pasted text only says whether the invoice has a TOTAL row at all, the price of
+       that row comes from the transfer amount. A typed amount is a total on its own */
+    if (total || readInvTaxTransferAmount()) createTotalPriceRow();
 
 
 

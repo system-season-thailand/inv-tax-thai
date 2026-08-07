@@ -317,28 +317,14 @@ const buildInvTaxTotalRow = (importedTotalRowsDiv) => {
     if (!priceToPay) return false;
 
     const totalRow = priceToPay.row;
-    const total = priceToPay.price;
     const priceElement = totalRow.querySelectorAll('p')[1];
 
-    let tax = 0;
-    if (total >= 10000) {
-        tax = 150;
-    } else if (total >= 8000) {
-        tax = 130;
-    } else if (total >= 6000) {
-        tax = 110;
-    } else if (total >= 4000) {
-        tax = 90;
-    } else if (total >= 2000) {
-        tax = 80;
-    } else {
-        tax = 60;
-    }
-
-    /* Build the price the same way the pasted text does (it is always in SAR) */
+    /* Build the price the same way the pasted text does: the typed transfer amount is the
+       only thing it is built from, so this starts on the three red question marks until
+       one is typed. The invoice company only says which row is the TOTAL one */
     priceElement.className = '';
     priceElement.setAttribute('style', 'padding: 5px 0');
-    priceElement.innerHTML = `SAR${'&nbsp;'.repeat(24)}${Number(total - tax).toLocaleString()}`;
+    priceElement.innerHTML = buildInvTaxTotalPriceText();
 
     /* Give the row the same look the pasted text gives to the TOTAL row */
     totalRow.className = 'invoice_company_row_div_class last_invoice_company_row_div_class';

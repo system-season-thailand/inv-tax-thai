@@ -34,6 +34,10 @@
         <h1>Dynamic INV Tax <span style="color: red; font-weight: bold;">THAILAND</span> Data</h1>
 
         <textarea id="dataInput" placeholder="Paste your data here"></textarea>
+
+        <!-- The TOTAL row of the invoice is worked out from this amount when it is filled -->
+        <input type="text" id="transfer_amount_input_id" inputmode="numeric" placeholder="Transfer Amount">
+
         <button onclick="playSoundEffect('click'); deleteTextAre()">Reset</button>
         <button onclick="playSoundEffect('click'); openInvCompImportDropdown()">Import Inv Company</button>
 
