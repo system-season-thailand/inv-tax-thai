@@ -209,14 +209,20 @@ function openPdfDownloadBox() {
 /* ==========================================================================
    The transfer amount
 
-   The price of the TOTAL row is the amount the office transferred minus its tax,
-   and that amount is the only thing the price is ever built from. While it is left
-   empty the row shows three red question marks instead of a price, so an invoice is
-   never handed out with a total nobody typed.
+   The price of the TOTAL row is a total minus its tax.
+
+   A pasted text carries its own total ("... SAR 9,820 (KURS 4,600) CREDIT"), so its
+   price is placed right away. An imported invoice company carries none into the inv
+   tax invoice, so its row shows three red question marks until the transfer amount is
+   typed. A typed transfer amount always wins over the total of the pasted text.
    ========================================================================== */
 
-/* Stands in for the price while no transfer amount has been typed */
+/* Stands in for the price while there is no total to build it from */
 const INV_TAX_MISSING_TOTAL_PRICE = '<span style="color: red;">???</span>';
+
+
+/* The total the pasted text gave, which an imported invoice company never sets */
+let invTaxPastedTotal = null;
 
 
 /* The tax that is taken off the total */
@@ -249,14 +255,23 @@ const readInvTaxTransferAmount = () => {
 };
 
 
-/* The whole price the TOTAL row shows, e.g. "SAR                        4,910",
-   or the three red question marks while there is no amount to build it from */
-const buildInvTaxTotalPriceText = () => {
+/* The total the price is built from: the typed transfer amount when there is one,
+   otherwise whatever the pasted text gave */
+const getInvTaxTotalToShow = () => {
     const transferAmount = readInvTaxTransferAmount();
 
-    return transferAmount === null
+    return transferAmount !== null ? transferAmount : invTaxPastedTotal;
+};
+
+
+/* The whole price the TOTAL row shows, e.g. "SAR                        4,910",
+   or the three red question marks while there is no total to build it from */
+const buildInvTaxTotalPriceText = () => {
+    const totalToShow = getInvTaxTotalToShow();
+
+    return totalToShow === null
         ? INV_TAX_MISSING_TOTAL_PRICE
-        : `SAR${'&nbsp;'.repeat(24)}${formatInvTaxTotal(transferAmount)}`;
+        : `SAR${'&nbsp;'.repeat(24)}${formatInvTaxTotal(totalToShow)}`;
 };
 
 
@@ -1176,7 +1191,7 @@ function processInvoiceData(data) {
 
 
 
-    const createTotalPriceRow = () => {
+    const createTotalPriceRow = (total) => {
         const totalDiv = document.createElement("div");
         totalDiv.id = "total_price_row_div_id";
 
@@ -1184,8 +1199,9 @@ function processInvoiceData(data) {
 
 
 
-        /* The typed transfer amount is the only thing the price is built from, so the row
-           starts on the three red question marks until one is typed */
+        /* The pasted text brought its own total, so the price is placed right away.
+           A typed transfer amount still wins over it */
+        invTaxPastedTotal = (total === null || total === '') ? null : Number(total);
         const totalPriceText = buildInvTaxTotalPriceText();
 
 
@@ -1214,9 +1230,8 @@ function processInvoiceData(data) {
     if (flights) createFlightRow(flights);
     if (transport) createTransportationRow(transport);
     if (visa) createVisaRow(visa);
-    /* The pasted text only says whether the invoice has a TOTAL row at all, the price of
-       that row comes from the transfer amount. A typed amount is a total on its own */
-    if (total || readInvTaxTransferAmount()) createTotalPriceRow();
+    /* A typed transfer amount is a total on its own, even when the pasted text holds none */
+    if (total || readInvTaxTransferAmount()) createTotalPriceRow(total);
 
 
 

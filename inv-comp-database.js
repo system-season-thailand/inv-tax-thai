@@ -319,9 +319,12 @@ const buildInvTaxTotalRow = (importedTotalRowsDiv) => {
     const totalRow = priceToPay.row;
     const priceElement = totalRow.querySelectorAll('p')[1];
 
-    /* Build the price the same way the pasted text does: the typed transfer amount is the
-       only thing it is built from, so this starts on the three red question marks until
-       one is typed. The invoice company only says which row is the TOTAL one */
+    /* An imported invoice company brings no total of its own into the inv tax invoice, so
+       the price waits on the transfer amount and shows the three red question marks until
+       it is typed. Any total left over from an earlier pasted text goes with it */
+    invTaxPastedTotal = null;
+
+    /* Build the price the same way the pasted text does (it is always in SAR) */
     priceElement.className = '';
     priceElement.setAttribute('style', 'padding: 5px 0');
     priceElement.innerHTML = buildInvTaxTotalPriceText();
@@ -508,6 +511,11 @@ const invCompImportContentForSelectedName = async (clickedInvCompDataName) => {
 
     /* Let the download know this invoice is ready to be stored in the inv tax DB table */
     new_or_imported_inv_company_variable = 'imported_inv_comp_company';
+
+
+    /* The invoice on the page is the imported one now, so the pasted text that built the
+       one before it is gone. Setting the value never fires "input", so nothing is rebuilt */
+    document.getElementById("dataInput").value = '';
 
 
     /* The invoice is fully rebuilt now */
